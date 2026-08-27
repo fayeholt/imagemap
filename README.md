@@ -1608,6 +1608,14 @@ This is a map showing the posterior view of a human body, where the area inside 
 
 ![GRIDS_BODY_MAP_BACK](./img/postpainimage1000px.png)
 
+**`CLICKABLE_BODY_MAP_FRONT`**
+
+A body map with 98 individually selectable grid cells for recording locations on the front of the body. Multiple cells can be selected. Selection codes range from `f001` to `f098`.
+
+Label the REDCap field clearly as **FRONT**. The patient's right is on the left of the image.
+
+![CLICKABLE_BODY_MAP_FRONT](./img/clickable_body_map.png)
+
 ## Usage
 To display one of the images above in a survey or data entry form, add a new field of type **Text Box** and include one of the following options in the **Action Tags / Field Annotation (optional)** field:
 
@@ -1636,6 +1644,8 @@ To display one of the images above in a survey or data entry form, add a new fie
 @IMAGEMAP=LADDER
 @IMAGEMAP=GRIDS_BODY_MAP_FRONT
 @IMAGEMAP=GRIDS_BODY_MAP_BACK
+@IMAGEMAP=CLICKABLE_BODY_MAP_FRONT
+@IMAGEMAP=CLICKABLE_BODY_MAP_BACK
 ```
 
 Each region of an image is associated with a key, for example, the "Ankle (front-left)" of the female body diagram is linked to the key "f34". To find a particular key for a body part, please refer to the HTML files (map files) located in the folder `maps`. After selecting multiple body parts, the field containing the action tag `@IMAGEMAP` will have as a value a string of comma-separated keys, e.g. "f36,f17,f18,f21". Similarly, if using the faces diagram, the field containing the action tag (e.g. `@IMAGEMAP=SMILE_SCALE`) will have the value corresponding to the face clicked.
