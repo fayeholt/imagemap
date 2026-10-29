@@ -574,7 +574,6 @@
 
                 lastKey = key;
 
-                // Apply pain intensity when painting is enabled
                 const intensity = $(image).data(
                     'paintIntensity'
                 );
@@ -587,15 +586,30 @@
                     const paintValues =
                         $(image).data('paintValues');
 
-                    paintValues[key] = intensity;
+                    const keys = module.getPaintKeys(
+                        key,
+                        areas
+                    );
 
-                    $(image).mapster('set_options', {
-                        areas: [{
-                            key: key,
-                            fillColor: color,
-                            fillOpacity: 0.4
-                        }]
+                    keys.forEach(function (paintKey) {
+                        paintValues[paintKey] = intensity;
+
+                        $(image).mapster('set_options', {
+                            areas: [{
+                                key: paintKey,
+                                fillColor: color,
+                                fillOpacity: 0.4
+                            }]
+                        });
+
+                        $(image).mapster(
+                            'set',
+                            true,
+                            paintKey
+                        );
                     });
+
+                    return;
                 }
 
                 $(image).mapster('set', true, key);
@@ -653,7 +667,32 @@
             return colors[intensity];
         },
 
-                // Allow map regions to be painted with pain intensity values
+                // Return the four cells in a 2x2 paint brush
+        getPaintKeys: function (key, areas) {
+            const match = key.match(/^c(\d+)r(\d+)$/);
+
+            if (!match) {
+                return [key];
+            }
+
+            const column = Number(match[1]);
+            const row = Number(match[2]);
+
+            const keys = [
+                `c${column}r${row}`,
+                `c${column + 1}r${row}`,
+                `c${column}r${row + 1}`,
+                `c${column + 1}r${row + 1}`
+            ];
+
+            return keys.filter(function (key) {
+                return areas.filter(
+                    '[data-key="' + key + '"]'
+                ).length;
+            });
+        },
+
+        // Allow map regions to be painted with pain intensity values
         setupPainting: function (img, setting) {
             const image = $(img).get(0);
             const mapName = $(image).attr('usemap').replace('#', '');
@@ -738,6 +777,11 @@
                         return;
                     }
 
+                    const keys = module.getPaintKeys(
+                        key,
+                        areas
+                    );
+
                     const intensity = $(image).data(
                         'paintIntensity'
                     );
@@ -746,17 +790,16 @@
                         intensity
                     );
 
-                    const paintValues =
-                        $(image).data('paintValues');
-
+                    keys.forEach(function (key) {
                     paintValues[key] = intensity;
 
-                    $(image).mapster('set_options', {
-                        areas: [{
-                            key: key,
-                            fillColor: color,
-                            fillOpacity: 0.4
-                        }]
+                        $(image).mapster('set_options', {
+                            areas: [{
+                                key: key,
+                                fillColor: color,
+                                fillOpacity: 0.4
+                            }]
+                        });
                     });
                 }
             );
