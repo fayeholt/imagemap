@@ -221,6 +221,11 @@
                 }
             });
 
+            // Enable click-and-drag selection when requested
+            if (setting.draggable) {
+                module.setupDragging(img);
+            }
+
             // On mobile devices where the viewport is fixed in redcap it may be necessary to resize width
             if (isMobileDevice) {
                 $(img).attr('resize_check', 'true');
@@ -403,6 +408,83 @@
                     });
                 }
             }
+        },
+
+        // Allow selecting map regions by clicking and dragging
+        setupDragging: function (img) {
+            const image = $(img).get(0);
+            const mapName = $(image).attr('usemap').replace('#', '');
+            const areas = $('map[name="' + mapName + '"] area');
+
+            let dragging = false;
+            let lastKey = null;
+
+            // Find the map region under the pointer
+            function getAreaKey(event) {
+                const rect = image.getBoundingClientRect();
+
+                // ImageMapster already scales the area coordinates
+                const x = event.clientX - rect.left;
+                const y = event.clientY - rect.top;
+
+                let key = null;
+
+                areas.each(function () {
+                    const coords = $(this)
+                        .attr('coords')
+                        .split(',')
+                        .map(Number);
+
+                    if (
+                        x >= coords[0] &&
+                        x < coords[2] &&
+                        y >= coords[1] &&
+                        y < coords[3]
+                    ) {
+                        key = $(this).attr('data-key');
+                        return false;
+                    }
+                });
+
+                return key;
+            }
+
+            // Select one region through ImageMapster
+            function selectArea(event) {
+                const key = getAreaKey(event);
+
+                if (!key || key === lastKey) {
+                    return;
+                }
+
+                lastKey = key;
+                $(image).mapster('set', true, key);
+            }
+
+            // Listen on the container because Mapster sits over the original image
+            const dragTarget = $(image).closest('.imagemap');
+
+            // Start drag selection
+            dragTarget.on('pointerdown.imagemapDrag', function (event) {
+                dragging = true;
+                lastKey = null;
+                selectArea(event.originalEvent);
+            });
+
+            // Select each region crossed while dragging
+            dragTarget.on('pointermove.imagemapDrag', function (event) {
+                if (!dragging) {
+                    return;
+                }
+
+                selectArea(event.originalEvent);
+            });
+
+            // Stop drag selection
+            $(document).on('pointerup.imagemapDrag', function () {
+                dragging = false;
+                lastKey = null;
+            });
         },
 
         // Resize window to fit mobile or orientation changes
