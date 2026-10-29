@@ -328,12 +328,18 @@
                         const parts = item.split(':');
 
                         const key = parts[0];
-                        const intensity = Number(parts[1]);
+                        const savedIntensity = parts[1];
+
+                        const intensity = savedIntensity === 'NA'
+                            ? 'NA'
+                            : Number(savedIntensity);
 
                         if (
                             !key ||
-                            intensity < 1 ||
-                            intensity > 10
+                            (
+                                intensity !== 'NA' &&
+                                (intensity < 1 || intensity > 10)
+                            )
                         ) {
                             return;
                         }
@@ -652,6 +658,7 @@
         // Return the color used for each pain intensity
         getPaintColor: function (intensity) {
             const colors = {
+                'NA': 'D3D3D3',
                 1: 'ffe066',
                 2: 'ffd43b',
                 3: 'fcc419',
@@ -699,7 +706,7 @@
             const areas = $('map[name="' + mapName + '"] area');
 
             // Store paint state on this image
-            $(image).data('paintIntensity', 1);
+            $(image).data('paintIntensity', 'NA');
             $(image).data('paintValues', {});
 
             // Find the map region under the pointer
@@ -736,9 +743,22 @@
             const controls = $('<div/>')
                 .css('margin-bottom', '10px');
 
-            $('<span/>')
-                .text('Pain intensity ')
+            $('<div/>')
+                .text('Please select a pain score ')
                 .css('margin-right', '8px')
+                .appendTo(controls);
+
+            $('<button/>', {
+                type: 'button',
+                text: 'N/A'
+            })
+                .css({
+                    'margin-right': '4px',
+                    'background-color': '#' + module.getPaintColor('NA')
+                })
+                .on('click', function () {
+                    $(image).data('paintIntensity', 'NA');
+                })
                 .appendTo(controls);
 
             for (let intensity = 1; intensity <= 10; intensity++) {
@@ -782,25 +802,21 @@
                         areas
                     );
 
-                    const intensity = $(image).data(
-                        'paintIntensity'
-                    );
+                    const intensity = $(image).data('paintIntensity');
+                    const color = module.getPaintColor(intensity);
+                    const paintValues = $(image).data('paintValues');
 
-                    const color = module.getPaintColor(
-                        intensity
-                    );
-
-                    keys.forEach(function (key) {
                     paintValues[key] = intensity;
 
-                        $(image).mapster('set_options', {
-                            areas: [{
-                                key: key,
-                                fillColor: color,
-                                fillOpacity: 0.4
-                            }]
-                        });
+                    $(image).mapster('set_options', {
+                        areas: [{
+                            key: key,
+                            fillColor: color,
+                            fillOpacity: 0.4
+                        }]
                     });
+
+                    $(image).data('paintValues', paintValues);
                 }
             );
         },
