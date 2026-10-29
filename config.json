@@ -450,6 +450,7 @@
             "image": "img/female_front.png",
             "hideInput": true,
             "draggable": true,
+            "paintable": true,
             "map": "maps/pain_body_female_front.html"
         },
         "PAIN_BODY_FEMALE_BACK": {
@@ -461,6 +462,7 @@
             "image": "img/female_back.png",
             "hideInput": true,
             "draggable": true,
+            "paintable": true,
             "map": "maps/pain_body_female_back.html"
         },
         "PAIN_BODY_MALE_FRONT": {
@@ -472,6 +474,7 @@
             "image": "img/male_front.png",
             "hideInput": true,
             "draggable": true,
+            "paintable": true,
             "map": "maps/pain_body_male_front.html"
         },
         "PAIN_BODY_MALE_BACK": {
@@ -483,6 +486,7 @@
             "image": "img/male_back.png",
             "hideInput": true,
             "draggable": true,
+            "paintable": true,
             "map": "maps/pain_body_male_back.html"
         }
     }
