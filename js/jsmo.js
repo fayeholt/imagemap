@@ -368,6 +368,11 @@
                 'paintValues',
                 paintValues
             );
+
+            $(img).data(
+                'loadingPaintKeys',
+                Object.keys(paintValues)
+            );
         },
 
         // Update the image map to match the field
@@ -430,6 +435,30 @@
             const selected = $(image).mapster('get');
             const tr = setting.tr;
 
+            const loadingKeys = $(image).data(
+                'loadingPaintKeys'
+            );
+
+            if (loadingKeys) {
+                const selectedKeys = selected
+                    ? selected.split(',')
+                    : [];
+
+                const loaded = loadingKeys.every(
+                    function (key) {
+                        return selectedKeys.includes(key);
+                    }
+                );
+
+                if (loaded) {
+                    $(image).removeData(
+                        'loadingPaintKeys'
+                    );
+                }
+
+                return;
+            }
+
             if (!selected) {
                 $(image).data('paintValues', {});
 
@@ -452,7 +481,7 @@
 
             // Build key:intensity values for selected regions
             const values = keys.map(function (key) {
-                const intensity = paintValues[key] || 1;
+                const intensity = paintValues[key] || 'NA';
 
                 paintValues[key] = intensity;
 
