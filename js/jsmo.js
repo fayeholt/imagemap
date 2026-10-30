@@ -739,14 +739,12 @@
                 return key;
             }
 
-            // Add the 1-10 pain scale above the map
+            // Add the 1-10 color scale above the map
             const controls = $('<div/>')
-                .css('margin-bottom', '10px');
-
-            $('<div/>')
-                .text('Please select a pain score ')
-                .css('margin-right', '8px')
-                .appendTo(controls);
+                .css({
+                    'margin-bottom': '10px',
+                    'text-align': 'center'
+                });
 
             $('<button/>', {
                 type: 'button',
